@@ -72,6 +72,53 @@ axios.interceptors.request.use(config => {
     return Promise.reject(error);
 })
 
+axios.interceptors.response.use(response => {
+    console.log(`Data fetched from ${response.config.url} at ${new Date().getTime()}`);
+    return response;
+}, error => {
+    return Promise.reject(error);
+})
+
+// Useful for authentication tokens
+function customHeaders() {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer myToken'
+        }
+    }
+
+    axios
+        .post('https://jsonplaceholder.typicode.com/todos', {
+            title: 'Learning Custom Headers',
+            completed: false
+        }, config)
+        .then(res => showResult(res))
+        .catch(err => alert(err));
+}
+
+// This function demonstrates how to transform the response data before it is handled by then or catch.
+// The transformResponse option allows you to modify the response data, such as changing its structure or content.
+// In this example, the title of the response data is converted to uppercase before being processed.
+function transformResponse() {
+    const options = {
+        method: 'post',
+        url: 'https://jsonplaceholder.typicode.com/todos',
+        data: {
+            title: 'Learning Transform Response',
+        },
+        // concat is used to add a new function to the existing transformResponse array
+        transformResponse: axios.defaults.transformResponse.concat(data => {
+            data.title = data.title.toUpperCase();
+            return data;
+        })
+    }
+
+    axios(options)
+        .then(res => showResult(res))
+        .catch(err => alert(err));
+}
+
 function showResult(res) {
     document.getElementById('result').innerHTML = `
     <div class="rounded-lg bg-gray-200 shadow-md px-4 py-2 my-4">
@@ -131,9 +178,10 @@ function showOutput(res) {
     `
 }
 
-
 document.getElementById('get').addEventListener('click', getTodos);
 document.getElementById('post').addEventListener('click', addTodo);
 document.getElementById('patch').addEventListener('click', updateTodo);
 document.getElementById('delete').addEventListener('click', deleteTodo);
 document.getElementById('sim').addEventListener('click', getMultipleDatas);
+document.getElementById('headers').addEventListener('click', customHeaders);
+document.getElementById('transform').addEventListener('click', transformResponse);
