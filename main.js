@@ -8,10 +8,12 @@ axios.defaults.headers.common['X-Auth-Token'] =
 // Asynchronous means that things can happen independently of the main program flow.
 function getTodos() {
     axios
-        .get('https://jsonplaceholder.typicode.com/todos?_limit=5')
+        // timeout is useful for limiting the amount of time the request takes before it is automatically cancelled
+        // To test it, click the GET data button many times and you will see that the request will be cancelled after 5 milliseconds
+        .get('https://jsonplaceholder.typicode.com/todos?_limit=5', { timeout: 500}) // timeout is used to set the time limit for the request
+        // it means that the request will be cancelled after 5 milliseconds
         .then(res => showResult(res)) // res means response
         .catch(err => alert(err)); // err means error
-
 }
 
 function addTodo() {
@@ -123,6 +125,68 @@ function transformResponse() {
 }
 
 
+function errorHandling() {
+    axios
+        .get('https://jsonplaceholder.typicode.com/fdfd', {
+            validateStatus: function (status) {
+                return status < 500; // Reject only if the status code is greater than or equal to 500
+            }
+        })
+        .then(res => showResult(res))
+        .catch(err=> {
+            // if (err.response) { // URL for testing: https://jsonplaceholder.typicode.com/todoos
+            //     // 400-499 status error codes (Client Errors)
+            //     alert(
+            //         `Status: ${err.response.status} - ${err.response.data} Headers: ${JSON.stringify(err.response.headers)}`
+            //     )
+            // }
+           if (err.response.status.code === 404) {
+                alert('Error: Page Not Found');
+           }
+           // else if (err.request) {
+           //      // 500-599 status error codes (Server Errors)
+           //      alert(`Status: ${err.request.status} - ${err.request.statusText}`);
+           // }
+            else if (err.request.status.code >= 500) {
+                alert('Error: Server Error');
+           }
+        })
+}
+
+// Cancel Token is used for cancelling requests
+// It is useful for when you want to cancel a request before it is completed
+function cancelToken() {
+    const source = axios.CancelToken.source();
+
+    axios
+        .get('https://jsonplaceholder.typicode.com/todos', {
+            cancelToken: source.token
+        })
+        .then(res => showResult(res))
+        .catch(thrown => {
+            if (axios.isCancel(thrown)) {
+                alert('Request cancelled', thrown.message);
+            } else {
+                alert('Error: ' + thrown.message);
+            }
+        });
+
+    if (true) { // For testing purposes
+        source.cancel('Request cancelled');
+    }
+}
+
+// Creating an Axios instance
+// creating an Axios instance with a base URL is useful when you want to avoid specifying the base URL repeatedly for each request
+const axiosInstance = axios.create({
+    baseURL: 'https://jsonplaceholder.typicode.com'
+});
+
+axiosInstance
+    .get('/comments?_limit=5')
+    .then(res => showOutput(res))
+    .catch(err => alert(err));
+
 function showResult(res) {
     document.getElementById('result').innerHTML = `
     <div class="rounded-lg bg-gray-200 shadow-md px-4 py-2 my-4">
@@ -189,3 +253,5 @@ document.getElementById('delete').addEventListener('click', deleteTodo);
 document.getElementById('sim').addEventListener('click', getMultipleDatas);
 document.getElementById('headers').addEventListener('click', customHeaders);
 document.getElementById('transform').addEventListener('click', transformResponse);
+document.getElementById('error').addEventListener('click', errorHandling);
+document.getElementById('cancel').addEventListener('click', cancelToken);
