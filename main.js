@@ -2,11 +2,41 @@
 
 
 function getTodos() {
-    axios.get('https://jsonplaceholder.typicode.com/todos')
+    axios
+        .get('https://jsonplaceholder.typicode.com/todos')
         .then(res => showResult(res)) // res means response
         .catch(err => console.log(err)); // err means error
 
 }
+
+function addTodo() {
+    axios
+        .post('https://jsonplaceholder.typicode.com/todos', {
+            title: 'Learn Axios',
+            completed: false
+        })
+        .then(res => showResult(res))
+        .catch(err => console.log(err));
+}
+// USE patch if you want to update only one field
+// USE put if you want to update all fields
+function updateTodo() {
+    axios
+        .put('https://jsonplaceholder.typicode.com/todos/1', {
+            title: 'Learn Axios',
+            completed: true
+        })
+        .then(res => showResult(res))
+        .catch(err => console.log(err));
+}
+
+function deleteTodo() {
+    axios
+        .delete('https://jsonplaceholder.typicode.com/todos/1')
+        .then(res => showResult(res))
+        .catch(err => console.log(err));
+}
+
 
 function showResult(res) {
     document.getElementById('result').innerHTML = `
@@ -38,3 +68,6 @@ function showResult(res) {
 }
 
 document.getElementById('get').addEventListener('click', getTodos);
+document.getElementById('post').addEventListener('click', addTodo);
+document.getElementById('patch').addEventListener('click', updateTodo);
+document.getElementById('delete').addEventListener('click', deleteTodo);
