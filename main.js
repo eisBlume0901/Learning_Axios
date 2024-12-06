@@ -1,3 +1,6 @@
+// Adding a default header to all Axios requests
+axios.defaults.headers.common['X-Auth-Token'] =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
 // AXIOS is a promise based HTTP client for the browser and node.js
 // Promise based means that you can take advantage of JavaScript's async and await for more readable asynchronous code.
@@ -84,7 +87,7 @@ function customHeaders() {
     const config = {
         headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer myToken'
+            Authorization: '[Insert JWT Token Here]'
         }
     }
 
@@ -118,6 +121,7 @@ function transformResponse() {
         .then(res => showResult(res))
         .catch(err => alert(err));
 }
+
 
 function showResult(res) {
     document.getElementById('result').innerHTML = `
